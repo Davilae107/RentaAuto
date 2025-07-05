@@ -1,8 +1,21 @@
 import TableData from './Component/Table'
+import Navbar from './Component/navbar'
 import type { Renta, Columna } from './types'
 import { useState, useEffect } from 'react'
-import { Box, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Typography } from '@mui/material'
+import { Box, Button, Dialog, DialogTitle, DialogContent, TextField, Typography } from '@mui/material'
 import { getRentas, createRenta, updateRenta, deleteRenta } from './libs/Api/rentaRequest'
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'
+import Login from './Component/Login'
+import Signup from './Component/Signup'
+
+// Interfaz para los datos que devuelve la API
+interface RentaAPI {
+  rentaID: number
+  nombre: string
+  vehiculo: string
+  fechaRenta: string
+  fechaFinal: string
+}
 
 const columnas: Columna<Renta>[] = [
   { key: 'cliente', header: 'Cliente' },
@@ -39,10 +52,11 @@ function FormularioRenta({ onSubmit, onCancel, initial }: {
   )
 }
 
-function App() {
+function MainApp() {
   const [rentas, setRentas] = useState<Renta[]>([])
   const [modalAbierto, setModalAbierto] = useState(false)
   const [editando, setEditando] = useState<Renta | null>(null)
+  const navigate = useNavigate()
 
   // Cargar rentas desde la API al iniciar
   useEffect(() => {
@@ -55,7 +69,7 @@ function App() {
       setRentas([])
       return data
     }
-    const mapped = data.map((item: any) => ({
+    const mapped = data.map((item: RentaAPI) => ({
       id: item.rentaID,
       cliente: item.nombre,
       vehiculo: item.vehiculo,
@@ -85,13 +99,20 @@ function App() {
   const handleEliminar = async (renta: Renta) => {
     await deleteRenta(renta.id)
     cargarRentas()
-    
   }
 
+  const handleHomeClick = () => {
+    navigate('/')
+  }
+
+  const handleLogoutClick = () => {
+    navigate('/login')
+  }
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: '#f5f5f5', p: 2 }}>
-      <Box sx={{ width: '100%', maxWidth: 1200, mx: 'auto', boxShadow: 2, bgcolor: 'white', borderRadius: 2, p: 3 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', p: 4 }}>
+      <Navbar onHomeClick={handleHomeClick} onLogoutClick={handleLogoutClick} />
+      <Box sx={{ boxShadow: 2, bgcolor: 'white', borderRadius: 2, p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4">Renta de Vehículos</Typography>
           <Button variant="contained" color="primary" onClick={() => { setEditando(null); setModalAbierto(true) }}>
@@ -111,6 +132,18 @@ function App() {
         </DialogContent>
       </Dialog>
     </Box>
+  )
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<MainApp />} />
+      </Routes>
+    </Router>
   )
 }
 
