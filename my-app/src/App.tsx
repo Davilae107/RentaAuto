@@ -1,7 +1,8 @@
 import TableData from './Component/Table'
 import type { Renta, Columna } from './types'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Box, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Typography } from '@mui/material'
+import { getRentas, createRenta, updateRenta, deleteRenta } from './libs/Api/rentaRequest'
 
 const columnas: Columna<Renta>[] = [
   { key: 'cliente', header: 'Cliente' },
@@ -43,14 +44,37 @@ function App() {
   const [modalAbierto, setModalAbierto] = useState(false)
   const [editando, setEditando] = useState<Renta | null>(null)
 
-  const handleGuardar = (renta: Omit<Renta, 'id'>) => {
-    if (editando) {
-      setRentas(rs => rs.map(r => r.id === editando.id ? { ...editando, ...renta } : r))
-      setEditando(null)
-    } else {
-      setRentas(rs => [...rs, { ...renta, id: Date.now() }])
+  // Cargar rentas desde la API al iniciar
+  useEffect(() => {
+    cargarRentas()
+  }, [])
+
+  const cargarRentas = async () => {
+    const data = await getRentas()
+    if (!data) {
+      setRentas([])
+      return data
     }
+    const mapped = data.map((item: any) => ({
+      id: item.rentaID,
+      cliente: item.nombre,
+      vehiculo: item.vehiculo,
+      fechaInicio: item.fechaRenta,
+      fechaFin: item.fechaFinal,
+      total: 0 // Ajusta si el backend envía este valor
+    }))
+    setRentas(mapped)
+  }
+
+  const handleGuardar = async (renta: Omit<Renta, 'id'>) => {
+    if (editando) {
+      await updateRenta(editando.id, renta)
+    } else {
+      await createRenta(renta)
+    }
+    setEditando(null)
     setModalAbierto(false)
+    cargarRentas()
   }
 
   const handleEditar = (renta: Renta) => {
@@ -58,9 +82,12 @@ function App() {
     setModalAbierto(true)
   }
 
-  const handleEliminar = (renta: Renta) => {
-    setRentas(rs => rs.filter(r => r.id !== renta.id))
+  const handleEliminar = async (renta: Renta) => {
+    await deleteRenta(renta.id)
+    cargarRentas()
+    
   }
+
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: '#f5f5f5', p: 2 }}>
