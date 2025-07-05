@@ -19,6 +19,7 @@ function TableData<T>({ data, columnas, onEdit, onDelete }: {
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => void;
 }) {
+  
   return (
     <TableContainer component={Paper} sx={{ mt: 3, width: '100%', overflowX: 'auto' }} className="tabla-responsive">
       <Table sx={{ minWidth: 650 }} size="small">
