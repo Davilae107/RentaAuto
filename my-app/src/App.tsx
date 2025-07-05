@@ -43,7 +43,7 @@ function Tabla<T>({ data, columnas, onEdit, onDelete }: {
   onDelete?: (row: T) => void;
 }) {
   return (
-    <TableContainer component={Paper} sx={{ mt: 3 }}>
+    <TableContainer component={Paper} sx={{ mt: 3 }} className="tabla-responsive">
       <Table>
         <TableHead>
           <TableRow>
@@ -143,14 +143,16 @@ function App() {
   }
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Renta de Vehículos</Typography>
-        <Button variant="contained" color="primary" onClick={() => { setEditando(null); setModalAbierto(true) }}>
-          Nueva renta
-        </Button>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ width: '100%', maxWidth: 900 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h4">Renta de Vehículos</Typography>
+          <Button variant="contained" color="primary" onClick={() => { setEditando(null); setModalAbierto(true) }}>
+            Nueva renta
+          </Button>
+        </Box>
+        <Tabla data={rentas} columnas={columnas} onEdit={handleEditar} onDelete={handleEliminar} />
       </Box>
-      <Tabla data={rentas} columnas={columnas} onEdit={handleEditar} onDelete={handleEliminar} />
       <Dialog open={modalAbierto} onClose={() => { setModalAbierto(false); setEditando(null) }}>
         <DialogTitle>{editando ? 'Editar Renta' : 'Nueva Renta'}</DialogTitle>
         <DialogContent>
