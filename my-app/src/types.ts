@@ -7,6 +7,14 @@ export type Renta = {
   total: number
 }
 
+export interface RentaAPI {
+  rentaID: number
+  nombre: string
+  vehiculo: string
+  fechaRenta: string
+  fechaFinal: string
+}
+
 export type Columna<T> = {
   key: keyof T
   header: string
