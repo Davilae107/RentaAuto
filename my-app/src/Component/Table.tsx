@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import '../App.css'
+
 
 function TableData<T>({ data, columnas, onEdit, onDelete }: {
   data: T[];
